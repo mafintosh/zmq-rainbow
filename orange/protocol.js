@@ -7,7 +7,7 @@ module.exports = function() {
 		var signature = frames[0];
 		var content = frames[1];
 
-		if (!signature || signature.toString('hex').indexOf('aa00') !== 0) {
+		if (!signature || signature.toString('hex').indexOf('aaa0') !== 0) {
 			protocol.emit('warning', 'invalid signature');
 			return;
 		}
@@ -41,19 +41,19 @@ module.exports = function() {
 	};
 
 	protocol.subscribe = function(channel) {
-		return [Buffer.concat([new Buffer([0xaa, 0x00, 0x01]), fromString(channel)])];
+		return [Buffer.concat([new Buffer([0xaa, 0xa0, 0x01]), fromString(channel)])];
 	};
 
 	protocol.publish = function(channel, content) {
-		return [Buffer.concat([new Buffer([0xaa, 0x00, 0x02]), fromString(channel)]), content];
+		return [Buffer.concat([new Buffer([0xaa, 0xa0, 0x02]), fromString(channel)]), content];
 	};
 
 	protocol.deliver = function(channel, content) {
-		return [Buffer.concat([new Buffer([0xaa, 0x00, 0x03]), fromString(channel)]), content];
+		return [Buffer.concat([new Buffer([0xaa, 0xa0, 0x03]), fromString(channel)]), content];
 	};
 
 	protocol.wtf = function(reason) {
-		return [Buffer.concat([new Buffer([0xaa, 0x00, 0x04]), fromString(reason)])];
+		return [Buffer.concat([new Buffer([0xaa, 0xa0, 0x04]), fromString(reason)])];
 	};
 
 	return protocol;
