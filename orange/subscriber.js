@@ -1,14 +1,13 @@
 var zmq = require('zmq');
-var sock = zmq.socket('sub');
+var sock = zmq.socket('dealer');
 
-module.exports = function(addr) {
-	sock.connect('tcp://'+addr+':30001');
+module.exports = function(addr, channel) {
+	sock.connect('tcp://'+addr+':30002');
+	sock.send(channel || '');
 
-	return function sub(channel, fn) {
-		if (typeof channel === 'function') return sub(null, channel);
-		sock.subscribe(channel || '');
-		sock.on('message', function(channel, message) {
-			fn(channel, message);
+	return function sub(fn) {
+		sock.on('message', function(message) {
+			fn(message);
 		});
 	};
 };
