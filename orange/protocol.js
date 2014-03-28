@@ -5,30 +5,29 @@ module.exports = function() {
 
 	protocol.parse = function(frames) {
 		var signature = frames[0];
+		var content = frames[1];
 
-		if (!signature || signature.toString('hex') !== 'aa00') {
+		if (!signature || signature.toString('hex').indexOf('aa00') !== 0) {
 			protocol.emit('warning', 'invalid signature');
 			return;
 		}
 
-		var cmd = frames[1] && frames[1].toString('hex');
+		var cmd = signature[2];
 
 		switch (cmd) {
-			case '01': // sub
-			if (!frames[2]) return protocol.emit('warning', 'invalid message 1');
-			protocol.emit('subscribe', frames[2].toString());
+			case 1: // sub
+			protocol.emit('subscribe', signature.slice(3).toString());
 			return;
-			case '02': // pub
-			if (!frames[2] || !frames[3]) return protocol.emit('warning', 'invalid message 2');
-			protocol.emit('publish', frames[2].toString(), frames[3]);
+			case 2: // pub
+			if (!content) return protocol.emit('warning', 'invalid message 2');
+			protocol.emit('publish', signature.slice(3).toString(), content);
 			return;
-			case '03': // deliver
-			if (!frames[2] || !frames[3]) return protocol.emit('warning', 'invalid message 3');
-			protocol.emit('deliver', frames[2].toString(), frames[3]);
+			case 3: // deliver
+			if (!content) return protocol.emit('warning', 'invalid message 3');
+			protocol.emit('deliver', signature.slice(3).toString(), content);
 			return;
-			case '04': // wtf
-			if (!frames[2]) return protocol.emit('warning', 'invalid message 4');;
-			protocol.emit('wtf', frames[2].toString());
+			case 4: // wtf
+			protocol.emit('wtf', signature.slice(3).toString());
 			return;
 		}
 
@@ -36,19 +35,19 @@ module.exports = function() {
 	};
 
 	protocol.subscribe = function(channel) {
-		return [new Buffer([0xaa, 0x00]), new Buffer([0x01]), channel];
+		return [Buffer.concat([new Buffer([0xaa, 0x00, 0x01]), new Buffer(channel)])];
 	};
 
 	protocol.publish = function(channel, content) {
-		return [new Buffer([0xaa, 0x00]), new Buffer([0x02]), channel, content];
+		return [Buffer.concat([new Buffer([0xaa, 0x00, 0x02]), new Buffer(channel)]), content];
 	};
 
 	protocol.deliver = function(channel, content) {
-		return [new Buffer([0xaa, 0x00]), new Buffer([0x03]), channel, content];
+		return [Buffer.concat([new Buffer([0xaa, 0x00, 0x03]), new Buffer(channel)]), content];
 	};
 
 	protocol.wtf = function(reason) {
-		return [new Buffer([0xaa, 0x00]), new Buffer([0x04]), reason];
+		return [Buffer.concat([new Buffer([0xaa, 0x00, 0x04]), new Buffer(reason)])];
 	};
 
 	return protocol;
