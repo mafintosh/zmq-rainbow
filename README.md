@@ -1,4 +1,4 @@
 zmq-rainbow
 ===========
 
-RFC for the Rainbow ZeroMQ econsystem
+RFC for the Rainbow ZeroMQ ecosystem.
