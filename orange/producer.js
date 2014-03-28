@@ -8,6 +8,10 @@ module.exports = function(addr) {
 
 	sock.connect('tcp://'+addr+':30002');
 
+	sock.on('message', function() {
+		p.parse(Array.prototype.slice.call(arguments));
+	});
+
 	var fn = function(channel, message) {
 		sock.send(p.publish(channel, message));
 	};

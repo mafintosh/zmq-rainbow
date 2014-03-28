@@ -58,6 +58,7 @@ router.on('message', function(envelope, message) {
 
 	p.on('warning', function(reason) {
 		console.log('received bad message', reason);
+		router.send([envelope].concat(p.wtf(reason)));
 	});
 
 	p.parse(Array.prototype.slice.call(arguments, 1));
