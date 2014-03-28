@@ -29,6 +29,8 @@ router.on('message', function(envelope, message) {
 	var p = protocol();
 
 	p.on('subscribe', function(channel) {
+		console.log('subscribe', channel.toString());
+
 		var c = channel.toString();
 		subscriptions[c] = subscriptions[c] || [];
 		subscriptions[c].push(envelope);

@@ -37,3 +37,5 @@ p.on('wtf', function() {
 });
 
 process.stdin.pipe(p.stream);
+
+console.log(protocol.specification)
