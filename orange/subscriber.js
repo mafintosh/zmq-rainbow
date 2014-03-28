@@ -5,8 +5,8 @@ var protocol = require('./protocol');
 module.exports = function(addr, channel) {
 	sock.connect('tcp://'+addr+':30002');
 
-	return function sub(fn) {
-		var p = protocol();
+	var p = protocol();
+	var sub = function(fn) {
 
 		sock.send(p.subscribe(channel));
 
@@ -17,5 +17,12 @@ module.exports = function(addr, channel) {
 		sock.on('message', function(message) {
 			p.parse(Array.prototype.slice.call(arguments))
 		});
+
+		return p;
 	};
+
+	sub.protocol = p;
+	sub.sock = sock;
+
+	return sub;
 };

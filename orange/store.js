@@ -56,5 +56,9 @@ router.on('message', function(envelope, message) {
 		console.log('wrf', reason);
 	});
 
+	p.on('warning', function(reason) {
+		console.log('received bad message', reason);
+	});
+
 	p.parse(Array.prototype.slice.call(arguments, 1));
 });

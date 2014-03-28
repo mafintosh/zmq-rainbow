@@ -8,7 +8,12 @@ module.exports = function(addr) {
 
 	sock.connect('tcp://'+addr+':30002');
 
-	return function(channel, message) {
+	var fn = function(channel, message) {
 		sock.send(p.publish(channel, message));
 	};
+
+	fn.protocol = p;
+	fn.sock = sock;
+
+	return fn;
 };
