@@ -15,8 +15,8 @@ var protocol = hprotocol()
 
 var p = protocol();
 
-sub(function(message) {
-	console.log('> '+message);
+sub(function(channel, message) {
+	console.log('> '+channel+' '+message);
 });
 
 p.on('pub', function(channel, message) {

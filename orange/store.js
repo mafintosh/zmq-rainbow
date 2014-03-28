@@ -1,4 +1,5 @@
 var zmq = require('zmq');
+var protocol = require('./protocol');
 
 var input = zmq.socket('dealer');
 var output = zmq.socket('pub');
@@ -7,8 +8,6 @@ var router = zmq.socket('router');
 input.bindSync('tcp://0.0.0.0:30000');
 output.bindSync('tcp://0.0.0.0:30001');
 router.bindSync('tcp://0.0.0.0:30002');
-
-var subscribers = {};
 
 input.on('message', function(channel, message) {
 	console.log('onmessage', channel.toString(), message.length);
@@ -23,8 +22,39 @@ input.on('message', function(channel, message) {
 	output.send(message);
 });
 
-router.on('message', function(channel, message) {
-	console.log('router handshake', channel.toString('hex'), message.length);
-	channel = channel.toString('hex');
-	subscribers[channel] = message.toString();
+var subscribers = {};
+var subscriptions = {};
+
+router.on('message', function(envelope, message) {
+	var p = protocol();
+
+	p.on('subscribe', function(channel) {
+		var c = channel.toString();
+		subscriptions[c] = subscriptions[c] || [];
+		subscriptions[c].push(envelope);
+	});
+
+	p.on('publish', function(channel, message) {
+		var c = channel.toString();
+
+		console.log('publish', channel, message);
+
+		(subscriptions[c] || []).forEach(function(envelope) {
+			router.send([envelope].concat(p.deliver(channel, message)));
+		});
+
+		(subscriptions[''] || []).forEach(function(envelope) {
+			router.send([envelope].concat(p.deliver(channel, message)));
+		});
+	});
+
+	p.on('deliver', function(channel, message) {
+		console.log('deliver', channel, message);
+	});
+
+	p.on('wtf', function(reason) {
+		console.log('wrf', reason);
+	});
+
+	p.parse(Array.prototype.slice.call(arguments, 1));
 });

@@ -1,12 +1,14 @@
 var zmq = require('zmq');
 var sock = zmq.socket('dealer');
+var protocol = require('./protocol');
 
 
 module.exports = function(addr) {
-	sock.connect('tcp://'+addr+':30000');
+	var p = protocol();
+
+	sock.connect('tcp://'+addr+':30002');
 
 	return function(channel, message) {
-		sock.send(channel, zmq.ZMQ_SNDMORE);
-		sock.send(message);
+		sock.send(p.publish(channel, message));
 	};
 };
