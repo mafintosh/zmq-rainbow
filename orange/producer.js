@@ -8,4 +8,7 @@ var publish = function(channel, message) {
 	sock.send(message);
 };
 
-publish('orange', 'hello world');
+setInterval(function() {
+	console.log('publising');
+	publish('orange', 'hello world');
+}, 1000);
