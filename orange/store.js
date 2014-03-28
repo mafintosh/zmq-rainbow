@@ -24,7 +24,7 @@ input.on('message', function(channel, message) {
 });
 
 router.on('message', function(channel, message) {
-	console.log('router onmessage', channel.toString('hex'), message.length);
+	console.log('router handshake', channel.toString('hex'), message.length);
 	channel = channel.toString('hex');
 	subscribers[channel] = message.toString();
 });
